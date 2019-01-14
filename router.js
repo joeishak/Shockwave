@@ -14,5 +14,8 @@ module.exports = function (app) {
        app.get('/img', images.testImages);
        app.get('/puppy', images.getImages);
        app.get('/heartbeat', health.heartbeat);
-       app.get('/traffic',traffic.getAllTrafficCams);
+       app.post('/traffic',traffic.getAllTrafficCams);
+       app.post('/payments', traffic.getPaymentsForCam);
+       app.get('/siteids', traffic.getAllSiteIds);
+       app.post('/streets', traffic.getDistinctStreets);
 }
