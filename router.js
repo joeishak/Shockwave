@@ -18,4 +18,6 @@ module.exports = function (app) {
        app.post('/payments', traffic.getPaymentsForCam);
        app.get('/siteids', traffic.getAllSiteIds);
        app.post('/streets', traffic.getDistinctStreets);
+       app.post('/compare', traffic.getComparissonTable);
+       app.get('/statistics', traffic.getAllStats);
 }

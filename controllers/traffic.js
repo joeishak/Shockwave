@@ -31,10 +31,15 @@ pool.connect(err => {
 exports.getAllTrafficCams = (req, res, next) => {
     const street_list = convertFilterList(req.body.street_list);
     const query = `select * from yonkers.cameras where street_one IN ` + ` (${street_list}) ` + ` OR street_two IN ` + ` (${street_list});`; 
+    const query2 = `SELECT location_code, site_id, lat, lng, street_one, street_two, direction_short, direction_long, status, construction,
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'issued') as 'issued',
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'paid') as 'paid',
+    (select  (sum(total) * 50) as 'EYTD' from yonkers.tickets where siteid = site_id and type = 'paid') as 'total_earnings',
+    (select  ((sum(total) * 50) * (0.41) - 885 ) from yonkers.tickets where siteid = site_id and type = 'paid') as 'ats_fees',
+    (select  ((select sum(total) from yonkers.tickets where type = 'paid' and siteid = site_id)/(select sum(total) from yonkers.tickets where type = 'issued' and siteid = site_id))) as 'collection_rate'
+     from yonkers.cameras WHERE  street_one IN ` + ` (${street_list}) ` + ` OR street_two IN ` + ` (${street_list});`; 
 
-    console.log('QUERY', query);
-
-    pool.query(query, (err, response, fields) => {
+    pool.query(query2, (err, response, fields) => {
         res.send(response);
     });
 };
@@ -66,13 +71,41 @@ exports.getPaymentsForCam = (req,res,next) => {
 exports.getDistinctStreets = (req,res,next) => {
     const street_column = req.body.street
     const query = `select distinct ` + street_column + ` from yonkers.cameras;` ;
-    // pool.query(query, (err, response, fields) => {
-    //     res.send(response);
-    // });
-    // res.send({response: query, street: street_column});
+
     pool.query(query, (err, response, fields) => {
         res.send(response);
     });
+}
+
+exports.getComparissonTable = (req,res,next) => {
+    const id_list = convertFilterList(req.body.site_id_list);
+    console.log(id_list);
+    const query = `SELECT site_id, direction_short, street_one, street_two, lat, lng, status, 
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'issued') as 'issued',
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'paid') as 'paid',
+    (select  (sum(total) * 50) as 'EYTD' from yonkers.tickets where siteid = site_id and type = 'paid') as 'total_earnings',
+    (select  ((sum(total) * 50) * (0.41) - 885 ) from yonkers.tickets where siteid = site_id and type = 'paid') as 'ats_fees',
+    (select  ((select sum(total) from yonkers.tickets where type = 'paid' and siteid = site_id)/(select sum(total) from yonkers.tickets where type = 'issued' and siteid = site_id))) as 'collection_rate'
+    from yonkers.cameras WHERE site_id IN ` + ` (${id_list});`;
+
+    console.log(query);
+
+     pool.query(query, (err, response, fields) => {
+        res.send(response);
+    });
+}
+
+exports.getAllStats = (req,res,next) => {
+    // const id_list = convertFilterList(req.body.site_id_list);
+    // console.log(id_list);
+    const query = `SELECT * from yonkers.stats;`;
+
+    // console.log(query);
+
+     pool.query(query, (err, response, fields) => {
+        res.send(response);
+    });
+
 }
 
 
