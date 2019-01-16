@@ -25,7 +25,22 @@ const pool = new mySql.createConnection(config)
 pool.connect(err => {
     if (err) console.log(err);
     else console.log('success');
-})
+});
+
+exports.getAllTrafficCamsByIDs = (req, res, next) => {
+    const site_id_list = convertFilterList(req.body.site_id_list);
+    const query2 = `SELECT location_code, site_id, lat, lng, street_one, street_two, direction_short, direction_long, status, construction,
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'issued') as 'issued',
+    (select sum(total) from yonkers.tickets where siteid = site_id and type = 'paid') as 'paid',
+    (select  (sum(total) * 50) as 'EYTD' from yonkers.tickets where siteid = site_id and type = 'paid') as 'total_earnings',
+    (select  ((sum(total) * 50) * (0.41) - 885 ) from yonkers.tickets where siteid = site_id and type = 'paid') as 'ats_fees',
+    (select  ((select sum(total) from yonkers.tickets where type = 'paid' and siteid = site_id)/(select sum(total) from yonkers.tickets where type = 'issued' and siteid = site_id))) as 'collection_rate'
+     from yonkers.cameras WHERE site_id IN ` + ` (${site_id_list});`; 
+
+    pool.query(query2, (err, response, fields) => {
+        res.send(response);
+    });
+}
 
 
 exports.getAllTrafficCams = (req, res, next) => {
@@ -105,8 +120,24 @@ exports.getAllStats = (req,res,next) => {
      pool.query(query, (err, response, fields) => {
         res.send(response);
     });
-
 }
+
+exports.getAllyearsFilters = (req,res,next) => {
+    const query = `select distinct stats_year from yonkers.stats;`;
+     pool.query(query, (err, response, fields) => {
+        res.send(response);
+    });
+}
+
+exports.getAllStatsFiltered = (req,res,next) => {
+    const yearsFilter = convertFilterList(req.body.years_filter);
+    const monthsFilter = convertFilterList(req.body.months_filter);
+    const query = `select * from yonkers.stats where stats_year in ` + ` (${yearsFilter}) ` + ` and stats_month in ` + `(${monthsFilter});`;
+     pool.query(query, (err, response, fields) => {
+        res.send(response);
+    });
+}
+
 
 
 

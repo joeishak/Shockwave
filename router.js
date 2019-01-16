@@ -20,4 +20,9 @@ module.exports = function (app) {
        app.post('/streets', traffic.getDistinctStreets);
        app.post('/compare', traffic.getComparissonTable);
        app.get('/statistics', traffic.getAllStats);
+       app.post('/allcamsbyid', traffic.getAllTrafficCamsByIDs)
+
+       // Home Page
+       app.get('/statistics/yearfilters', traffic.getAllyearsFilters);
+       app.post('/statistics/statsfiltered', traffic.getAllStatsFiltered);
 }
