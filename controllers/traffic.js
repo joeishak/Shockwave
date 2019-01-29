@@ -92,6 +92,18 @@ exports.getDistinctStreets = (req,res,next) => {
     });
 }
 
+exports.getViewDetailsRevenue = (req,res,next) => {
+    const id_list = convertFilterList(req.body.site_id_list);
+    const query = `select monthOfEntry as "month", sum(total) * 50 as total_earnings from yonkers.tickets where type = 'paid'  
+    AND siteid IN ` +  ` (${id_list}) ` + `group by monthOfEntry; `;
+
+    console.log(query);
+
+     pool.query(query, (err, response, fields) => {
+        res.send(response);
+    });
+}
+
 exports.getComparissonTable = (req,res,next) => {
     const id_list = convertFilterList(req.body.site_id_list);
     console.log(id_list);
@@ -127,6 +139,7 @@ exports.getAllyearsFilters = (req,res,next) => {
      pool.query(query, (err, response, fields) => {
         res.send(response);
     });
+    // TEST
 }
 
 exports.getAllStatsFiltered = (req,res,next) => {

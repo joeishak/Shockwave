@@ -21,6 +21,7 @@ module.exports = function (app) {
        app.post('/compare', traffic.getComparissonTable);
        app.get('/statistics', traffic.getAllStats);
        app.post('/allcamsbyid', traffic.getAllTrafficCamsByIDs)
+       app.post('/viewdetails/revenue', traffic.getViewDetailsRevenue)
 
        // Home Page
        app.get('/statistics/yearfilters', traffic.getAllyearsFilters);
