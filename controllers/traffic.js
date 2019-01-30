@@ -1,30 +1,21 @@
 
 /**Node Packages and Global Object - Declaration / Instantiation */
-let express = require('express');
-let router = express.Router();
+// let express = require('express');
+// let router = express.Router();
 let mySql = require('mysql');
 let _ = require('lodash');
-var config =
-{
+var config = {
     user: "sa",
     password: "ft3t7pgz",
     host: "70.176.243.97",
     port: "3306",
     database: 'yonkers'
 }
-// var config =
-// {
-//     user: "fossilapi",
-//     password: "d8fj482kbwer",
-//     host: "192.168.1.5",
-//     port: "3306",
-//     database: 'egypt'
-// }
+
 const pool = new mySql.createConnection(config)
-// Check for Errors
 pool.connect(err => {
     if (err) console.log(err);
-    else console.log('success');
+    else console.log('connected to MySQL database:', config.database);
 });
 
 exports.getAllTrafficCamsByIDs = (req, res, next) => {
@@ -41,7 +32,6 @@ exports.getAllTrafficCamsByIDs = (req, res, next) => {
         res.send(response);
     });
 }
-
 
 exports.getAllTrafficCams = (req, res, next) => {
     const street_list = convertFilterList(req.body.street_list);
@@ -60,9 +50,7 @@ exports.getAllTrafficCams = (req, res, next) => {
 };
 
 exports.getAllSiteIds = (req, res, next) => {
-    // const site_id_list = convertFilterList(req.body.id_list);
     const query = `select distinct site_id from yonkers.cameras;`; 
-
     pool.query(query, (err, response, fields) => {
         res.send(response);
     });
@@ -97,8 +85,6 @@ exports.getViewDetailsRevenue = (req,res,next) => {
     const query = `select monthOfEntry as "month", sum(total) * 50 as total_earnings from yonkers.tickets where type = 'paid'  
     AND siteid IN ` +  ` (${id_list}) ` + `group by monthOfEntry; `;
 
-    console.log(query);
-
      pool.query(query, (err, response, fields) => {
         res.send(response);
     });
@@ -106,7 +92,7 @@ exports.getViewDetailsRevenue = (req,res,next) => {
 
 exports.getComparissonTable = (req,res,next) => {
     const id_list = convertFilterList(req.body.site_id_list);
-    console.log(id_list);
+    // console.log(id_list);
     const query = `SELECT site_id, direction_short, street_one, street_two, lat, lng, status, 
     (select sum(total) from yonkers.tickets where siteid = site_id and type = 'issued') as 'issued',
     (select sum(total) from yonkers.tickets where siteid = site_id and type = 'paid') as 'paid',
@@ -115,19 +101,13 @@ exports.getComparissonTable = (req,res,next) => {
     (select  ((select sum(total) from yonkers.tickets where type = 'paid' and siteid = site_id)/(select sum(total) from yonkers.tickets where type = 'issued' and siteid = site_id))) as 'collection_rate'
     from yonkers.cameras WHERE site_id IN ` + ` (${id_list});`;
 
-    console.log(query);
-
      pool.query(query, (err, response, fields) => {
         res.send(response);
     });
 }
 
 exports.getAllStats = (req,res,next) => {
-    // const id_list = convertFilterList(req.body.site_id_list);
-    // console.log(id_list);
-    const query = `SELECT * from yonkers.stats;`;
-
-    // console.log(query);
+    const query = `SELECT * from yonkers.stats;`
 
      pool.query(query, (err, response, fields) => {
         res.send(response);
@@ -139,7 +119,6 @@ exports.getAllyearsFilters = (req,res,next) => {
      pool.query(query, (err, response, fields) => {
         res.send(response);
     });
-    // TEST
 }
 
 exports.getAllStatsFiltered = (req,res,next) => {
@@ -150,9 +129,6 @@ exports.getAllStatsFiltered = (req,res,next) => {
         res.send(response);
     });
 }
-
-
-
 
 function convertFilterList(arrayList) {
     return "'" + arrayList.join("\', \'") + "' ";
