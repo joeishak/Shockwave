@@ -7,13 +7,10 @@
 // const images = require('./controllers/images');
 const traffic = require('./controllers/traffic');
 const health = require('./controllers/health');
+const dashboard = require('./controllers/dashboard');
 
 module.exports = function (app) {
        app.get('/', health.health);
-       // app.post('/signup', authentication.signup);
-       // app.post('/signin', requireSignIn, authentication.signin);
-       // app.get('/img', images.testImages);
-       // app.get('/puppy', images.getImages);
        app.get('/heartbeat', health.heartbeat);
        app.post('/traffic',traffic.getAllTrafficCams);
        app.post('/payments', traffic.getPaymentsForCam);
@@ -25,4 +22,9 @@ module.exports = function (app) {
        app.post('/viewdetails/revenue', traffic.getViewDetailsRevenue);
        app.get('/statistics/yearfilters', traffic.getAllyearsFilters);
        app.post('/statistics/statsfiltered', traffic.getAllStatsFiltered);
+
+       app.post('/dashboard/totals', dashboard.getDashboardTotals);
+       app.post('/dashboard/charts/bymonth', dashboard.getBreakDownByMonth);
+       app.post('/dashboard/charts/bymonthbreakdown', dashboard.getBreakDownByMonthWithDetails);
+       app.post('/dashboard/table', dashboard.getTableData);
 }
