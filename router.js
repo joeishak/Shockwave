@@ -8,6 +8,7 @@
 const traffic = require('./controllers/traffic');
 const health = require('./controllers/health');
 const dashboard = require('./controllers/dashboard');
+const infoburst = require('./controllers/infoburst');
 
 module.exports = function (app) {
        app.get('/', health.health);
@@ -22,6 +23,8 @@ module.exports = function (app) {
        app.post('/viewdetails/revenue', traffic.getViewDetailsRevenue);
        app.get('/statistics/yearfilters', traffic.getAllyearsFilters);
        app.post('/statistics/statsfiltered', traffic.getAllStatsFiltered);
+
+       app.get('/infoburst/test', infoburst.getInfoburstStats);
 
        app.post('/dashboard/totals', dashboard.getDashboardTotals);
        app.post('/dashboard/charts/bymonth', dashboard.getBreakDownByMonth);

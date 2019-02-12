@@ -90,6 +90,24 @@ exports.getTableData = (req,res,next) => {
 
 // Returns for Kendo Chart Series and Categories
 exports.getBreakDownByMonth = (req,res,next) => {
+    const length =  req.body.months_filter.length;
+    const allMonths = availableMonthsArray
+    const month = req.body.months_filter;
+    month.sort(function(a,b){
+        return allMonths.indexOf(a) > allMonths.indexOf(b);
+    });
+    let newArr = ['','','','','','','','','','','',''];
+    for (let i = 0; i < allMonths.length; i++) {
+        let toFind = allMonths[i].toLowerCase();
+        
+        for (let k = 0; k < month.length; k++) {
+            if (toFind === month[k].toLowerCase()) {
+                newArr[i] = month[k]
+            }
+        }
+    }
+    let monthNew = newArr.filter(Boolean);
+
     const yearsFilter = convertFilterList(req.body.years_filter);
     const monthsFilter = convertFilterList(req.body.months_filter);
     const type = req.body.type;
@@ -100,14 +118,34 @@ exports.getBreakDownByMonth = (req,res,next) => {
     pool.query(query, (err, response, fields) => {
         let dataResponse = Object.values(JSON.parse(JSON.stringify(response)));
         res.send({
-            series: getKendoChartSeries(dataResponse),
-            categories: availableMonthsArray
+            series: getKendoChartSeries(dataResponse, length, monthNew),
+            categories: monthNew
           });
     });
 
 }
 
 exports.getBreakDownByMonthWithDetails = (req,res,next) => {
+
+    const length =  req.body.months_filter.length;
+    const allMonths = availableMonthsArray
+    const month = req.body.months_filter;
+    month.sort(function(a,b){
+        return allMonths.indexOf(a) > allMonths.indexOf(b);
+    });
+    let newArr = ['','','','','','','','','','','',''];
+    for (let i = 0; i < allMonths.length; i++) {
+        let toFind = allMonths[i].toLowerCase();
+        
+        for (let k = 0; k < month.length; k++) {
+            if (toFind === month[k].toLowerCase()) {
+                newArr[i] = month[k]
+            }
+        }
+    }
+    let monthNew = newArr.filter(Boolean);
+
+
     const yearsFilter = convertFilterList(req.body.years_filter);
     const monthsFilter = convertFilterList(req.body.months_filter);
     const subtype1 = req.body.type1;
@@ -120,11 +158,12 @@ exports.getBreakDownByMonthWithDetails = (req,res,next) => {
 
     pool.query(query, (err, response, fields) => {
         let dataResponse = Object.values(JSON.parse(JSON.stringify(response)));
-        res.send(getBreakDownByMonthWithDetails(dataResponse, subtype1, subtype2, subtype3, subtype4));
+        res.send(getBreakDownByMonthWithDetails(length, monthNew, dataResponse, subtype1, subtype2, subtype3, subtype4));
     });
 }
 
-function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subtype4) {
+function getBreakDownByMonthWithDetails(length, month, data, subtype1, subtype2, subtype3, subtype4) {
+    // console.log("HERE", length, month);
     let groupedByMonth = _.groupBy(data, function(item) {return item.stats_month});
     let keys = Object.keys(groupedByMonth);
     let values = Object.values(groupedByMonth);
@@ -134,9 +173,10 @@ function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subt
       newArr.push({month: keys[i], values: values[i]});
     }
 
-    let arrayValue1 = [0,0,0,0,0,0,0,0,0,0,0,0];
-    for (let i = 0; i < availableMonthsArray.length; i++) {
-      let toFind = availableMonthsArray[i].toLowerCase();
+    let arrayValue1 = [];
+    for (let i = 0; i < length; i++) { arrayValue1.push(0); }
+    for (let i = 0; i < month.length; i++) {
+      let toFind = month[i].toLowerCase();
       for (let k = 0; k < newArr.length; k++) {
         if (newArr[k].month.toLowerCase() === toFind) {
             arrayValue1[i] = newArr[k].values.map(ele => {
@@ -147,10 +187,12 @@ function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subt
       }
     }
 
-    let arrayValue2 = [0,0,0,0,0,0,0,0,0,0,0,0];
-    for (let i = 0; i < availableMonthsArray.length; i++) {
-      let toFind = availableMonthsArray[i].toLowerCase();
 
+
+    let arrayValue2 = [];
+    for (let i = 0; i < length; i++) { arrayValue2.push(0); }
+    for (let i = 0; i < month.length; i++) {
+      let toFind = month[i].toLowerCase();
       for (let k = 0; k < newArr.length; k++) {
         if (newArr[k].month.toLowerCase() === toFind) {
             arrayValue2[i] = newArr[k].values.map(ele => {
@@ -161,10 +203,10 @@ function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subt
       }
     }
 
-    let arrayValue3 = [0,0,0,0,0,0,0,0,0,0,0,0];
-    for (let i = 0; i < availableMonthsArray.length; i++) {
-      let toFind = availableMonthsArray[i].toLowerCase();
-
+    let arrayValue3 = [];
+    for (let i = 0; i < length; i++) { arrayValue3.push(0); }
+    for (let i = 0; i < month.length; i++) {
+      let toFind = month[i].toLowerCase();
       for (let k = 0; k < newArr.length; k++) {
         if (newArr[k].month.toLowerCase() === toFind) {
             arrayValue3[i] = newArr[k].values.map(ele => {
@@ -175,10 +217,10 @@ function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subt
       }
     }
 
-    let arrayValue4 = [0,0,0,0,0,0,0,0,0,0,0,0];
-    for (let i = 0; i < availableMonthsArray.length; i++) {
-      let toFind = availableMonthsArray[i].toLowerCase();
-
+    let arrayValue4 = [];
+    for (let i = 0; i < length; i++) { arrayValue4.push(0); }
+    for (let i = 0; i < month.length; i++) {
+      let toFind = month[i].toLowerCase();
       for (let k = 0; k < newArr.length; k++) {
         if (newArr[k].month.toLowerCase() === toFind) {
             arrayValue4[i] = newArr[k].values.map(ele => {
@@ -210,13 +252,16 @@ function getBreakDownByMonthWithDetails(data, subtype1, subtype2, subtype3, subt
             {name: subtype2.toString(), data: arrayValue2 },
             {name: subtype3.toString(), data: arrayValue3 },
             {name: subtype4.toString(), data: arrayValue4 },
-        ]
+        ],
+        categories: month
     }
+
+    // console.log(completePackage);
 
     return completePackage;
 }
 
-function getKendoChartSeries(data) {
+function getKendoChartSeries(data, length, calendar) {
     let groupedByYear = _.groupBy(data, function(item) {return item.stats_year});
     let keys = Object.keys(groupedByYear);
     let values = Object.values(groupedByYear);
@@ -227,16 +272,20 @@ function getKendoChartSeries(data) {
     let kendoNetRevenue = newArr.map(ele => {
       return {
         name: ele.year,
-        data: cleanData(ele.values)
+        data: cleanData(ele.values, length, calendar)
       }
     });
     return kendoNetRevenue;
 }
 
-function cleanData(values) {
-    let categoriesArr = [0,0,0,0,0,0,0,0,0,0,0,0];
-    for (let i = 0; i < availableMonthsArray.length; i++) {
-      let toFind = availableMonthsArray[i].toLowerCase();
+function cleanData(values, length, calendar) {
+    let categoriesArr = [];
+    for (let i = 0; i < length; i++) {
+        categoriesArr.push(0);
+    }
+
+    for (let i = 0; i < calendar.length; i++) {
+      let toFind = calendar[i].toLowerCase();
       for (let k = 0; k < values.length; k++) {
         if (values[k].stats_month.toLowerCase() === toFind) {
             // console.log(values[k]);
@@ -245,6 +294,7 @@ function cleanData(values) {
         }
       }
     }
+    // console.log(categoriesArr);
     return categoriesArr;
 }
 
