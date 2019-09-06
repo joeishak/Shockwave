@@ -8,7 +8,7 @@
 const traffic = require('./controllers/traffic');
 const health = require('./controllers/health');
 const dashboard = require('./controllers/dashboard');
-const infoburst = require('./controllers/infoburst');
+// const infoburst = require('./controllers/infoburst');
 
 module.exports = function (app) {
        app.get('/', health.health);
@@ -24,7 +24,7 @@ module.exports = function (app) {
        app.get('/statistics/yearfilters', traffic.getAllyearsFilters);
        app.post('/statistics/statsfiltered', traffic.getAllStatsFiltered);
 
-       app.get('/infoburst/test', infoburst.getInfoburstStats);
+       // app.get('/infoburst/test', infoburst.getInfoburstStats);
 
        app.post('/dashboard/totals', dashboard.getDashboardTotals);
        app.post('/dashboard/charts/bymonth', dashboard.getBreakDownByMonth);

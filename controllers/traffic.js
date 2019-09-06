@@ -7,7 +7,7 @@ let _ = require('lodash');
 var config = {
     user: "sa",
     password: "ft3t7pgz",
-    host: "70.176.243.97",
+    host: "vm1.infosol.com",
     port: "3306",
     database: 'yonkers'
 }
@@ -15,7 +15,7 @@ var config = {
 const pool = new mySql.createConnection(config)
 pool.connect(err => {
     if (err) console.log(err);
-    else console.log('connected to MySQL database:', config.database);
+    else console.log('connected to MySQL database:', config.database + 'on host: ' + config.host);
 });
 
 exports.getAllTrafficCamsByIDs = (req, res, next) => {
