@@ -29,7 +29,7 @@ app.use(function(err,req,res,next) {
 router(app);
 
 //Server Setup
-var port = process.env.PORT || 3090;
+var port = process.env.PORT || 3094;
 let server = http.createServer(app);
 server.listen(port);
 
